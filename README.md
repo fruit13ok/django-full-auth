@@ -4,21 +4,11 @@
 
 ```bash
 $ django-admin startproject authly .
-```
-
-2. Make a Django app called `authly_app`:
-
-```bash
 $ django-admin startapp authly_app
+$ mkdir authly_app/templates authly_app/media authly_app/static authly_app/media/profile_pics authly_app/templates/authly_app
 ```
 
-3. Create the additional folders '/templates', '/media' and '/static':
-
-```bash
-$ mkdir templates media static media/profile_pics templates/authly_app
-```
-
-Django also has models and views created for our app 'authly_app' which should me migrated:
+Django also has models and views created for our app `authly_app` which should me migrated before we start making our own models. This will also set up our built-in `User` model. Make sure to setup Postgresql as our default database:
 
 ```bash
 $ python3 manage.py migrate
@@ -26,12 +16,13 @@ $ python3 manage.py migrate
 
 
 ### Modifying the Project Files.
-Open up authly/settings.py and add the lines for other _DIR to look like :
+Open up `authly/settings.py` and add the lines for other _DIR to look like :
 
 ```python
 # authly/settings.py
 # Build paths inside the project like this: os.path.join(BASE_DIR, …)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# add the below three lines
 TEMPLATE_DIR = os.path.join(BASE_DIR,'authly_app/templates')
 STATIC_DIR = os.path.join(BASE_DIR,'authly_app/static')
 MEDIA_DIR = os.path.join(BASE_DIR,'authly_app/media')
@@ -57,8 +48,8 @@ Add these lines at the end of our `authly/settings.py` for static, templates and
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [STATIC_DIR,]
 MEDIA_ROOT = MEDIA_DIR
-MEDIA_URL = ‘/media/’
-LOGIN_URL = ‘/authly_app/user_login/’
+MEDIA_URL = '/media/'
+LOGIN_URL = '/authly_app/user_login/'
 ```
 
 Next we create the `authly_app/models.py` to be used that will be the basis of our `forms.py`. Import Django's `User` model in `models.py`:
@@ -116,10 +107,10 @@ In `authly_app/views.py`:
 
 ```python
 # authly_app/views.py
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from authly_app.forms import UserForm, UserProfileInfoForm
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
@@ -133,7 +124,7 @@ def special(request):
 @login_required
 def user_logout(request):
     logout(request)
-    return HttpResponseRedirect(reverse('index'))
+    return redirect('index')
 
 def register(request):
     registered = False
@@ -147,7 +138,6 @@ def register(request):
             profile = profile_form.save(commit=False)
             profile.user = user
             if 'profile_pic' in request.FILES:
-                print('found it')
                 profile.profile_pic = request.FILES['profile_pic']
             profile.save()
             registered = True
@@ -156,8 +146,7 @@ def register(request):
     else:
         user_form = UserForm()
         profile_form = UserProfileInfoForm()
-    return render(request,'authly_app/registration.html',
-                          {'user_form':user_form,'profile_form':profile_form,'registered':registered})
+    return render(request, 'authly_app/registration.html', {'user_form':user_form,'profile_form':profile_form,'registered':registered})
 
 def user_login(request):
     if request.method == 'POST':
@@ -172,7 +161,7 @@ def user_login(request):
                 return HttpResponse("Your account was inactive.")
         else:
             print("Someone tried to login and failed.")
-            print("They used username: {} and password: {}".format(username,password))
+            print(f'They used username: {username} and password: {password}'
             return HttpResponse("Invalid login details given")
     else:
         return render(request, 'authly_app/login.html', {})
@@ -204,7 +193,7 @@ In `base.html`:
           {% else %}
             <li><a class="navbar-link" href="{% url 'authly_app:user_login' %}">Login</a></li>
           {% endif %}
-</ul>
+        </ul>
       </div>
     </nav>
     <div class="container">
@@ -267,7 +256,7 @@ In `registration.html`:
       {% else %}
         <h1>Register Here</h1>
         <h3>Just fill out the form.</h3>
-<form enctype="multipart/form-data" method="POST">
+        <form enctype="multipart/form-data" method="POST">
           {% csrf_token %}
           {{ user_form.as_p }}
           {{ profile_form.as_p }}
