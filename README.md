@@ -100,7 +100,7 @@ Register your models in authly_app/admin.py too
 ```python
 # authly_app/admin.py
 from django.contrib import admin
-from authly_app.models import UserProfileInfo, User
+from authly_app.models import UserProfileInfo
 # Register your models here.
 admin.site.register(UserProfileInfo)
 
@@ -115,7 +115,6 @@ from django.shortcuts import render, redirect
 from authly_app.forms import UserForm, UserProfileInfoForm
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
-from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
 def index(request):
@@ -160,7 +159,7 @@ def user_login(request):
         if user:
             if user.is_active:
                 login(request,user)
-                return HttpResponseRedirect(reverse('index'))
+                return redirect('index')
             else:
                 return HttpResponse("Your account was inactive.")
         else:
@@ -190,12 +189,12 @@ In `base.html`:
           {# Django Home Link / Admin Link / Register Link#}
           <li><a class="navbar-brand" href="{% url 'index' %}">DJANGO</a></li>
           <li><a class="navbar-link" href="{% url 'admin:index' %}">Admin</a></li>
-          <li><a class="navbar-link" href="{% url 'authly_app:register' %}">Register</a></li>     
+          <li><a class="navbar-link" href="{% url 'register' %}">Register</a></li>     
           {# Some logic on what to display for last item#}
           {% if user.is_authenticated %}
             <li><a href="{% url 'logout' %}">Logout</a></li>
           {% else %}
-            <li><a class="navbar-link" href="{% url 'authly_app:user_login' %}">Login</a></li>
+            <li><a class="navbar-link" href="{% url 'user_login' %}">Login</a></li>
           {% endif %}
         </ul>
       </div>
@@ -234,7 +233,7 @@ In `login.html`:
   <div class="container">
     <div class="jumbotron">
       <h1>Login here :</h1>
-        <form method="post" action="{% url 'authly_app:user_login' %}">
+        <form method="post" action="{% url 'user_login' %}">
           {% csrf_token %}
           {# A more "HTML" way of creating the login form#}
           <label for="username">Username:</label>
@@ -279,35 +278,35 @@ In `registration.html`:
 We then register the above urls into our **app** `urls.py` files for this create a file `authly_app/urls.py`:
 
 ```python
-# authly_app/urls.py
-from django.conf.urls import url
-from authly_app import views
+from django.urls import path
+from . import views
 
-# SET THE NAMESPACE!
-app_name = 'authly_app'
-
-# Be careful setting the name to just /login use userlogin instead!
 urlpatterns=[
+  
+    path('', views.index, name='index'),
+
     path('register', views.register, name='register'),
     path('user_login',views.user_login,name='user_login'),
+    path('logout', views.user_logout, name='logout'),
+
+    path('api/users', views.sendJson, name='sendJson'),
+    path('special',views.special, name='special'),
 ]
 ```
 In the main `urls.py` file the rest of the pattern is specified:
 
 ```python
 # authly/urls.py
+# authly/urls.py
 from django.contrib import admin
 from django.urls import path
-from django.conf.urls import url,include
-from authly_app import views
-git
+from django.conf.urls import include
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index, name='index'),
-    path('special',views.special, name='special'),
-    path('authly_app/',include('authly_app.paths',
-    path('logout', views.user_logout, name='logout'),
+    path('',include('authly_app.urls')),
 ]
+
 ```
 
 Apply the migrations using
