@@ -1,4 +1,4 @@
-#Django Auth!
+# Django Auth!
 
 This tutorial will provide you with a basic authorizaiton suite that allows you to signup, login, and logout. You'll notice a protected route(s), a one-to-one relationship, and some extra goodies sprinkled in. Get your google hats strapped, this is going to be intense!
 
