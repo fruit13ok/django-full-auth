@@ -1,3 +1,7 @@
+#Django Auth!
+
+This tutorial will provide you with a basic authorizaiton suite that allows you to signup, login, and logout. You'll notice a protected route(s), a one-to-one relationship, and some extra goodies sprinkled in. Get your google hats strapped, this is going to be intense!
+
 ### Creating the Project structure.
 
 1. Start a Django project called `authly`:
@@ -167,7 +171,7 @@ def user_login(request):
         return render(request, 'authly_app/login.html', {})
 ```
 
-The templates can be arranged now for generating the views, we use four templates for this : ‘base.html’, ‘registration.html’, ‘login.html’, ‘index.html’
+The templates can be arranged now for generating the views, we use four templates for this : `base.html`, `registration.html`, `login.html`, `index.html`
 
 In `base.html`:
 ```html
@@ -183,7 +187,7 @@ In `base.html`:
     <nav class="navbar navbar-default navbar-static-top">
       <div class="container">
         <ul class="nav navbar-nav">
-{# Django Home Link / Admin Link / Register Link#}
+          {# Django Home Link / Admin Link / Register Link#}
           <li><a class="navbar-brand" href="{% url 'index' %}">DJANGO</a></li>
           <li><a class="navbar-link" href="{% url 'admin:index' %}">Admin</a></li>
           <li><a class="navbar-link" href="{% url 'authly_app:register' %}">Register</a></li>     
@@ -230,17 +234,17 @@ In `login.html`:
   <div class="container">
     <div class="jumbotron">
       <h1>Login here :</h1>
-<form method="post" action="{% url 'authly_app:user_login' %}">
+        <form method="post" action="{% url 'authly_app:user_login' %}">
           {% csrf_token %}
           {# A more "HTML" way of creating the login form#}
           <label for="username">Username:</label>
           <input type="text" name="username" placeholder="Username">
-<label for="password">Password:</label>
+          <label for="password">Password:</label>
           <input type="password" name="password" placeholder="Password">
-<input type="submit" name="" value="Login">
-</form>
-</div>
-  </div>
+          <input type="submit" name="" value="Login">
+        </form>
+      </div>
+    </div>
 {% endblock %}
 ```
 
@@ -252,9 +256,12 @@ In `registration.html`:
   <div class="container">
     <div class="jumbotron">
       {% if registered %}
-        <h1>Thank you for registering!</h1>
+
+      <h1>Thank you for registering!</h1>
+      
       {% else %}
-        <h1>Register Here</h1>
+      
+      <h1>Register Here</h1>
         <h3>Just fill out the form.</h3>
         <form enctype="multipart/form-data" method="POST">
           {% csrf_token %}
@@ -275,8 +282,10 @@ We then register the above urls into our **app** `urls.py` files for this create
 # authly_app/urls.py
 from django.conf.urls import url
 from authly_app import views
+
 # SET THE NAMESPACE!
 app_name = 'authly_app'
+
 # Be careful setting the name to just /login use userlogin instead!
 urlpatterns=[
     path('register', views.register, name='register'),
@@ -291,6 +300,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url,include
 from authly_app import views
+git
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
