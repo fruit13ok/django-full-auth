@@ -1,0 +1,21 @@
+{% extends "django_reddit_app/base.html" %}
+{% block content %}
+{% load staticfiles %}
+<h2>Post title: {{ post.title }} <a href="">(edit)</a></h2>
+<!-- <img src="{% static 'profile_pics/dog1.jpg' %}"> -->
+<img src="{{ BASE_DIR }}{{ user.userprofileinfo.profile_pic.url }}">
+<p>Post content: {{ post.content }}</p>
+<p>Post site url: {{ post.site_url }}</p>
+<p>Post vote total: {{ post.vote_total }}</p>
+<p>Post user name: {{ post.user.username }}</p>
+<p>Post created at: {{ post.created_at }}</p>
+<h3>Comments <a href="{% url 'comment_create' pk=post.pk %}">(+)</a></h3>
+<ul>
+   {% for comment in post.comments.all %}
+       <li>
+           <a href="">{{ comment.content }}</a>
+           <p>By: {{ comment.user.username }}</p>
+       </li>
+   {% endfor %}
+</ul>
+{% endblock %}
