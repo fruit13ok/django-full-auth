@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django_reddit_app.forms import UserForm, UserProfileInfoForm, PostForm, CommentForm
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
@@ -75,26 +75,16 @@ def post_create(request):
         post_form = PostForm()
     return render(request, 'django_reddit_app/post_form.html', {'post_form': post_form})
 
-# def comment_create(request, pk):
-#     if request.method == 'POST':
-#         comment_form = CommentForm(request.POST)
-#         post_form = PostForm(request.POST)
-#         if comment_form.is_valid() and post_form.is_valid():
-#             comment = comment_form.save()
-#             post = post_form.save()
-#             return redirect('post_detail', pk=post.pk)
-#     else:
-#         comment_form = CommentForm()
-#     return render(request, 'django_reddit_app/comment_form.html', {'comment_form': comment_form})
-
 def comment_create(request, pk):
+    post = get_object_or_404(Post, pk=pk)
     if request.method == 'POST':
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
             comment = comment_form.save()
-            comment.post = pk
-            # return redirect('post_detail', pk=comment.pk)
-            return redirect('post_list')
+            # comment.post = pk
+            comment.post = post
+            comment.save()
+            return redirect('post_detail', pk=post.pk)
     else:
         comment_form = CommentForm()
     return render(request, 'django_reddit_app/comment_form.html', {'comment_form': comment_form})
